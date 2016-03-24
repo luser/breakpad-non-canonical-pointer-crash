@@ -50,8 +50,8 @@ LIBS := \
   $(BREAKPAD_SRCDIR)/src/client/windows/Release/lib/crash_generation_server.lib \
   $(BREAKPAD_SRCDIR)/src/client/windows/Release/lib/exception_handler.lib
 CXX := cl
-COMPILE := $(CXX) -c -Fo
-LINK := link -MACHINE:X64 -OUT:
+COMPILE := $(CXX) -Zi -c -Fo
+LINK := link -DEBUG -MACHINE:X64 -OUT:
 else
 EXE :=
 OBJ_SUFFIX := .o

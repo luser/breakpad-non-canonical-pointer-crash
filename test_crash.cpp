@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     int* foo = reinterpret_cast<int*>(kBadAddress);
     do_crash(foo);
   } else {
-    Func f = reinterpret_cast<Func>(kBadAddress);
+    volatile Func f = reinterpret_cast<Func>(kBadAddress);
     f();
   }
 
