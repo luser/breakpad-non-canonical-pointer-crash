@@ -2,3 +2,5 @@
 *~
 test_crash
 *.o
+*.exe
+*.obj

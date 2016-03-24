@@ -1,7 +1,7 @@
 BREAKPAD_SRCDIR := ../breakpad/src
 BREAKPAD_OBJDIR := ../obj-breakpad
 
-OS := $(shell uname -s)
+OS := $(strip $(shell uname -s))
 
 SOURCES := test_crash.cpp
 
@@ -41,20 +41,31 @@ SOURCES += \
 LIBS := -framework CoreFoundation
 endif
 
-ifeq ($(OS),windows)
-#...
+ifeq (MINGW32,$(OS:MINGW32%=MINGW32))
+EXE := .exe
 OBJ_SUFFIX := .obj
+LIBS := \
+  $(BREAKPAD_SRCDIR)/src/client/windows/Release/lib/common.lib \
+  $(BREAKPAD_SRCDIR)/src/client/windows/Release/lib/crash_generation_client.lib \
+  $(BREAKPAD_SRCDIR)/src/client/windows/Release/lib/crash_generation_server.lib \
+  $(BREAKPAD_SRCDIR)/src/client/windows/Release/lib/exception_handler.lib
+CXX := cl
+COMPILE := $(CXX) -c -Fo
+LINK := link -MACHINE:X64 -OUT:
 else
+EXE :=
 OBJ_SUFFIX := .o
 CXXFLAGS += -std=c++11
+COMPILE := $(CXX) -c -o 
+LINK := $(CXX) -o 
 endif
 
 CXXFLAGS += -I$(BREAKPAD_SRCDIR)/src
 
 OBJS := $(addsuffix $(OBJ_SUFFIX),$(basename $(notdir $(SOURCES))))
 
-test_crash: $(OBJS)
-	$(CXX) -o $@ $^ $(BREAKPAD_LIBS) $(LIBS)
+test_crash$(EXE): $(OBJS)
+	$(LINK)$@ $^ $(BREAKPAD_LIBS) $(LIBS)
 
 define srcdep
 $(basename $(notdir $1))$(OBJ_SUFFIX): $1
@@ -62,4 +73,4 @@ endef
 $(foreach f,$(SOURCES),$(eval $(call srcdep,$(f))))
 
 $(OBJS):
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(COMPILE)$@ $(CXXFLAGS) $<
